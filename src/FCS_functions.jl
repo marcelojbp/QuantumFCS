@@ -20,3 +20,13 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 function fcscumulants_recursive(H::AbstractOperator, J, mJ, nCum; tol=1e-3, nu = vcat(-1*ones(length(J), ones(length(J)))))
     return nothing
 end
+
+""" 
+
+Testfunction that simply outputs testfunction works!
+
+""" 
+function testfunction() 
+        println("testfunction works!")
+        return nothing
+end
