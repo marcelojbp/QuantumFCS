@@ -10,17 +10,17 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `mJ`: Vector containing the monitored jump operators.
 * `Jdagger=dagger.(Jdagger)`: Vector containing the hermitian conjugates of the
         jump operators. If they are not given they are calculated automatically.
-* `nu`: vector of length 2*length(J) weights for each jump operator. By default down jumps, J, have weight -1 and up-jumps have weight +1.
+* `nu`: vector of length length(mJ) with weights for each jump operator. By default down jumps, J, have weight +1 and up-jumps have weight -1.
 * `apply`: Decide whether we use the drazin_apply or not. By default it is set to :false .
 * `kwargs...`: Further arguments are passed on to the ode solver.
 """
-function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = steadystate.eigenvector(H, J), nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
+function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = steadystate.eigenvector(H, J), nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))))
     l = length(rho_ss)
     # Identity in Liouville space
     IdL = Matrix{ComplexF64}(I, l, l)
     # Vectorired identity operator
     vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
-    # Jump operators ℒ(n)
+    # Jump d/dχ n-derivatives, ℒ(n)
     Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
     # Vectorized steady-state
     vrho0 = vec(rho_ss.data)
@@ -40,15 +40,17 @@ function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = 
             LD = drazin(H, J, rho_ss)
             for n = 2:nC
             #Computing the "states" 
-            vrho[n] = LD*sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
-            #Computing the cumulants 
-            vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
+            valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
+            vrho[n] = LD*valpha
+            # and the n-th cumulant
+            vI[n] = real(vId*(sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n)))
              end
         else
             for n = 2:nC
                 # Here we do the same but using the drazin_apply function
-                vrho[n] = drazin_apply(H, J, sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1), rho_ss)
-                vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
+                valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
+                vrho[n] = drazin_apply(H, J, valpha, rho_ss)
+                vI[n] = real(vId*(sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n)))
              end 
         end
     end
@@ -88,9 +90,9 @@ Calculate the vectorized super-operator ℒ(n) = ∑ₖ (νₖ)ⁿ (Lₖ*)⊗L�
 # Arguments
 * `mJ`: List of monitored jumps
 * `n` : Power of the weights νₖ. By default set to 1, since this case appears more often.
-* `nu`: Set of weights νₖ, by default set to -1 for emission and +1 for absorption jumps.
+* `nu`: vector of length length(mJ) with weights for each jump operator. By default down jumps, J, have weight +1 and up-jumps have weight -1.
 """
-    function m_jumps(mJ; n=1, nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
+    function m_jumps(mJ; n=1, nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))))
         return sum(nu[k]^n*kron(conj(mJ[k].data), mJ[k].data) for k = 1:length(mJ))
     end
     
