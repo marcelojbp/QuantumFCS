@@ -67,3 +67,43 @@ Calculate the vectorized super-operator ℒ(n) = ∑ₖ (νₖ)ⁿ (Lₖ*)⊗L�
         return sum(nu[k]^n*kron(conj(mJ[k].data), mJ[k].data) for k = 1:length(mJ))
     end
     
+""" 
+
+    drazin_apply() 
+Calculates the vector resulting from the Drazin inverse being applied to another vector. 
+
+# Arguments 
+* `H`: Arbitrary operator specifying the Hamiltonian.
+* `J`: Vector containing all jump operators which can be of any arbitrary
+    operator type.
+* `ρss ` : steady state of the system as a density matrix
+* `α` : input state as a density matrix
+
+"""
+function drazin_apply(H, J, ρα, ρss = steadystate.master(H,J)[2][1])
+    ## Constructing the matrix 
+
+    # constructing the liouvillian from the Hamiltonian and the jump operators 
+    L = Matrix(liouvillian(H, J;).data)
+
+    # constructing unitmatrix to append to liouvillian
+    unitm = diagm(ones(size(L)[1]))
+
+    # constructing the final matrix consiting of the liouvillian and the unit matrix 
+    Mat = cat(L,unitm;dims=1)
+
+    ## Constructing the right hand side 
+
+    # vectorizing the steady state
+    ρssvec = vec(Matrix(ρss.data))
+
+    # vectorizing the state that the drazin inverse is being applied to  
+    αvec = vec(ρα.data)
+
+    # constructing the right hand side of the linear system 
+    rhs = append!(ραvec - ρssvec*sum(ραvec),zeros(size(L)[1]))
+
+    ## returning the result 
+    
+    return Mat\rhs
+end 

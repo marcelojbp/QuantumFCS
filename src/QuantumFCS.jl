@@ -6,4 +6,5 @@ module QuantumFCS
     export drazin
     export vecjump
     export m_jumps
+    export drazin_apply
 end

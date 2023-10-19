@@ -71,6 +71,19 @@ and ``\mathcal{L}^+`` being the Drazin inverse of ``\mathcal{L}``.
 fcscumulants_recursive
 ```
 
+```@docs 
+drazin
+```
+
+```@docs 
+m_jumps
+```
+
+```@docs 
+drazin_apply
+```
+
+
 
 # Examples 
 
