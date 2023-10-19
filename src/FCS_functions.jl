@@ -11,23 +11,45 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `Jdagger=dagger.(Jdagger)`: Vector containing the hermitian conjugates of the
         jump operators. If they are not given they are calculated automatically.
 * `nu`: vector of length 2*length(J) weights for each jump operator. By default down jumps, J, have weight -1 and up-jumps have weight +1.
+* `apply`: Decide whether we use the drazin_apply or not. By default it is set to :false .
 * `kwargs...`: Further arguments are passed on to the ode solver.
 """
 function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = steadystate.eigenvector(H, J), nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
     l = length(rho_ss)
+    # Identity in Liouville space
     IdL = Matrix{ComplexF64}(I, l, l)
+    # Vectorired identity operator
     vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
+    # Jump operators ℒ(n)
     Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
+    # Vectorized steady-state
     vrho0 = vec(rho_ss.data)
-    vI = 0.0*Vector{Float64}(undef, nC)
+    # Empty list which will collect the cumulants
+    vI = Vector{Float64}(undef, nC)
+    # First cumulant, computed directly
     vI[1] = real(vId* Ln[1]*vrho0)
+    # If we are interested in any higher cumulant we start to use the recursive scheme
     if nC > 1
+        # Initializing the list of "states" used in the recursion
         vrho = [Vector{ComplexF64}(undef, l) for j=1:nC]
+        # We set the first to be the steady-state
         vrho[1] = vrho0
-        LD = drazin(H, J, rho_ss)
-        for n = 2:nC
+        #  We now can compute the Drazin inverse directly or use the drazin_apply function
+        if apply == :false
+            # Computing the Drazin inverse
+            LD = drazin(H, J, rho_ss)
+            for n = 2:nC
+            #Computing the "states" 
             vrho[n] = LD*sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
+            #Computing the cumulants 
             vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
+             end
+        else
+            for n = 2:nC
+                # Here we do the same but using the drazin_apply function
+                vrho[n] = drazin_apply(H, J, sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1), rho_ss)
+                vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
+             end 
         end
     end
     return vI
@@ -46,11 +68,16 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
  """    
     function drazin(H::AbstractOperator, J; ρss = steadystate.eigenvector(H, J))
         d = length(H)
+        # Vectorizing the steady-state and the identity
         vId = reshape(Matrix(identityoperator(H).data), d)'
         vss = reshape(Matrix(ρss.data), d)
-        vL = Matrix(L.data)
+        # vectorized liouvillian
+        vL = matrix(liouvillian(H, J).data)
+        # Liouville space's identity
         IdL = Matrix{ComplexF64}(I, d, d)
+        # We introduce Q, which projects any vector in the complement of the kernel o L
         Q = IdL - vss*vId
+        # The Drazin inverse is computed by projecting the Moore-Penrose pseudo-inverse, computed using pinv.
         LD = Q*pinv(vL)*Q
         return LD
     end
