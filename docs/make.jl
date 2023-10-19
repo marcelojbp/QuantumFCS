@@ -1,2 +1,3 @@
-using Documenter, QuantumFCS
-makedocs(;sitename = "QuantumFCS")
+using Documenter
+using QuantumFCS
+makedocs(;sitename = "QuantumFCS")  

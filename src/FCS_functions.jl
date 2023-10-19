@@ -14,23 +14,23 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `kwargs...`: Further arguments are passed on to the ode solver.
 """
 function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = steadystate.eigenvector(H, J), nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
-        l = length(rho_ss)
-        vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
-        Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
-        vrho0 = vec(rho_ss.data)
-        vI = Vector{Float64}(undef, nC)
-        vI[1] = real(vId* Ln[1]*vrho0)
-        if nC > 1
-            vrho = [Vector{ComplexF64}(undef, l) for j=1:nC+1]
-            vrho[1] = vrho0
-            IdL = Matrix{ComplexF64}(I, l, l)
-            LD = drazin(H, J)
-            for n = 2:nC
-                vrho[n] = LD*sum(binomial(n, m)*(vI[m]*IdL - Ln[m])*vrho[n+1-m] for m=1:n)
-                vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
-            end
+    l = length(rho_ss)
+    IdL = Matrix{ComplexF64}(I, l, l)
+    vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
+    Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
+    vrho0 = vec(rho_ss.data)
+    vI = 0.0*Vector{Float64}(undef, nC)
+    vI[1] = real(vId* Ln[1]*vrho0)
+    if nC > 1
+        vrho = [Vector{ComplexF64}(undef, l) for j=1:nC]
+        vrho[1] = vrho0
+        LD = drazin(H, J, rho_ss)
+        for n = 2:nC
+            vrho[n] = LD*sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
+            vI[n] = real(vId*sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))
         end
-        return vI
+    end
+    return vI
     end
 """
     drazin(H, J; rho_ss = steadystate.eigenvector(H, J))
