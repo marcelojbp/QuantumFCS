@@ -79,6 +79,19 @@ drazin
 m_jumps
 ```
 
+```@docs 
+drazin
+```
+
+```@docs 
+m_jumps
+```
+
+```@docs 
+drazin_apply
+```
+
+
 
 # Examples 
 
