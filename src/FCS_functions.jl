@@ -130,7 +130,7 @@ function drazin_apply(H, J, ρα, ρss = steadystate.master(H,J)[2][1])
     αvec = vec(ρα.data)
 
     # constructing the right hand side of the linear system 
-    rhs = append!(ραvec - ρssvec*sum(ραvec),zeros(size(L)[1]))
+    rhs = append!(αvec - ρssvec*sum(αvec),zeros(size(L)[1]))
 
     ## returning the result 
     
