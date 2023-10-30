@@ -74,7 +74,7 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
         vId = reshape(Matrix(identityoperator(H).data), d)'
         vss = reshape(Matrix(ρss.data), d)
         # vectorized liouvillian
-        vL = matrix(liouvillian(H, J).data)
+        vL = Matrix(liouvillian(H, J).data)
         # Liouville space's identity
         IdL = Matrix{ComplexF64}(I, d, d)
         # We introduce Q, which projects any vector in the complement of the kernel o L
