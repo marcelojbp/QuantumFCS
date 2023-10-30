@@ -110,26 +110,27 @@ Calculates the vector resulting from the Drazin inverse being applied to another
 
 """
 function drazin_apply(H, J, αvec, ρss = steadystate.master(H,J)[2][1])
-      ## Constructing the matrix 
+    ## Constructing the matrix 
 
-    # constructing the liouvillian from the Hamiltonian and the jump operators 
-    L = Matrix(liouvillian(H, J;).data)
-    
-    # constructing unitmatrix to append to liouvillian
-    unitm = vec(identityoperator(basis).data)'
-    
-    # constructing the final matrix consiting of the liouvillian and the unit matrix 
-    Mat = cat(L, unitm; dims = 1)
+  # constructing the liouvillian from the Hamiltonian and the jump operators 
+  L = Matrix(liouvillian(H, J;).data)
+  
+  # constructing unitmatrix to append to liouvillian
+  unitrow = vec(identityoperator(basis).data)'
+  
+  # constructing the left hand side consiting of the liouvillian and the unit matrix row 
+  lhs = cat(L, unitrow; dims = 1)
 
-    ## Constructing the right hand side 
+  ## Constructing the right hand side 
 
-    # vectorizing the steady state
-    ρssvec = vec(Matrix(ρss.data))
-    
-    # constructing the right hand side of the linear system 
-    rhs = append!(αvec - ρssvec*sum(αvec), 0)
+  # vectorizing the steady state
+  ρssvec = vec(Matrix(ρss.data))
+  
+  # constructing the right hand side of the linear system 
+  rhs = append!(αvec - ρssvec .* (unitrow * αvec), 0)
 
-    ## returning the result 
-    
-    return Mat\rhs
+  ## returning the result 
+  
+  return lhs\rhs
+
 end 
