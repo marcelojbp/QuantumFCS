@@ -14,7 +14,7 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `apply`: Decide whether we use the drazin_apply or not. By default it is set to :false .
 * `kwargs...`: Further arguments are passed on to the ode solver.
 """
-function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = steadystate.eigenvector(H, J), nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))))
+function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64, rho_ss::Operator; apply = :false, nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))))
     l = length(rho_ss)
     # Identity in Liouville space
     IdL = Matrix{ComplexF64}(I, l, l)
@@ -23,21 +23,21 @@ function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = 
     # Jump d/dχ n-derivatives, ℒ(n)
     Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
     # Vectorized steady-state
-    vrho0 = vec(rho_ss.data)
+    vrho_ss = vec(rho_ss.data)
     # Empty list which will collect the cumulants
     vI = Vector{Float64}(undef, nC)
     # First cumulant, computed directly
-    vI[1] = real(vId* Ln[1]*vrho0)
+    vI[1] = real(vId* Ln[1]*vrho_ss)
     # If we are interested in any higher cumulant we start to use the recursive scheme
     if nC > 1
         # Initializing the list of "states" used in the recursion
         vrho = [Vector{ComplexF64}(undef, l) for j=1:nC]
         # We set the first to be the steady-state
-        vrho[1] = vrho0
+        vrho[1] = vrho_ss
         #  We now can compute the Drazin inverse directly or use the drazin_apply function
         if apply == :false
             # Computing the Drazin inverse
-            LD = drazin(H, J, rho_ss)
+            LD = drazin(H, J, vrho_ss, vId, IdL)
             for n = 2:nC
             #Computing the "states" 
             valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
@@ -49,7 +49,7 @@ function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64; rho_ss = 
             for n = 2:nC
                 # Here we do the same but using the drazin_apply function
                 valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
-                vrho[n] = drazin_apply(H, J, valpha, rho_ss)
+                vrho[n] = drazin_apply(H, J, valpha, vrho_ss, vId)
                 vI[n] = real(vId*(sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n)))
              end 
         end
@@ -68,19 +68,13 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
 * `rho_ss`: Density matrix specifying the steady-state of the Liouvillian. By default, it is found through steadystate.eigenvector. 
          For large matrices the steady-state should be provided, as the best steady-state solver could vary.
  """    
-    function drazin(H::AbstractOperator, J; ρss = steadystate.eigenvector(H, J))
-        d = length(H)
-        # Vectorizing the steady-state and the identity
-        vId = reshape(Matrix(identityoperator(H).data), d)'
-        vss = reshape(Matrix(ρss.data), d)
+    function drazin(H::AbstractOperator, J, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}}, IdL::Matrix{ComplexF64})
         # vectorized liouvillian
-        vL = Matrix(liouvillian(H, J).data)
-        # Liouville space's identity
-        IdL = Matrix{ComplexF64}(I, d, d)
+        L = Matrix(liouvillian(H, J).data)
         # We introduce Q, which projects any vector in the complement of the kernel o L
-        Q = IdL - vss*vId
+        Q = IdL - vrho_ss*vId
         # The Drazin inverse is computed by projecting the Moore-Penrose pseudo-inverse, computed using pinv.
-        LD = Q*pinv(vL)*Q
+        LD = Q*pinv(L)*Q
         return LD
     end
  """
@@ -110,8 +104,8 @@ Calculates the vector resulting from the Drazin inverse being applied to another
 * `vId`    : vectorized identity operator
 
 """
-function drazin_apply(H, J, valpha, vrho_ss, vId)
-  ## Constructing the matrix 
+function drazin_apply(H::AbstractOperator, J, alphavec::Vector{ComplexF64}, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}})
+    ## Constructing the matrix 
 
   # constructing the Liouvillian from the Hamiltonian and the jump operators 
   L = Matrix(liouvillian(H, J;).data)
@@ -119,11 +113,11 @@ function drazin_apply(H, J, valpha, vrho_ss, vId)
   # constructing the left hand side consiting of the liouvillian and the unit matrix row 
   lhs = cat(L, vId; dims = 1)
 
-  ## Constructing the right hand side 
 
-  rhs = append!(valpha - vrho_ss .* (vId* valpha), 0)
+  # constructing the right hand side of the linear system 
+  rhs = append!(alphavec - vrho_ss .* (vId* alphavec), 0)
 
-  ## Returning the result 
+  ## returning the result 
   
   return lhs\rhs
 
