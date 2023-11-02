@@ -105,31 +105,25 @@ Calculates the vector resulting from the Drazin inverse being applied to another
 * `H`: Arbitrary operator specifying the Hamiltonian.
 * `J`: Vector containing all jump operators which can be of any arbitrary
     operator type.
-* `ρss ` : steady state of the system as a density matrix
-* `α` : input state as a density matrix
+* `vrho_ss ` : steady state of the system as a vectorized density matrix
+* `valpha` : input state as a vectorized density matrix
+* `vId`    : vectorized identity operator
 
 """
-function drazin_apply(H, J, αvec, ρss = steadystate.master(H,J)[2][1])
-    ## Constructing the matrix 
+function drazin_apply(H, J, valpha, vrho_ss, vId)
+  ## Constructing the matrix 
 
-  # constructing the liouvillian from the Hamiltonian and the jump operators 
+  # constructing the Liouvillian from the Hamiltonian and the jump operators 
   L = Matrix(liouvillian(H, J;).data)
   
-  # constructing unitmatrix to append to liouvillian
-  unitrow = vec(identityoperator(basis).data)'
-  
   # constructing the left hand side consiting of the liouvillian and the unit matrix row 
-  lhs = cat(L, unitrow; dims = 1)
+  lhs = cat(L, vId; dims = 1)
 
   ## Constructing the right hand side 
 
-  # vectorizing the steady state
-  ρssvec = vec(Matrix(ρss.data))
-  
-  # constructing the right hand side of the linear system 
-  rhs = append!(αvec - ρssvec .* (unitrow * αvec), 0)
+  rhs = append!(valpha - vrho_ss .* (vId* valpha), 0)
 
-  ## returning the result 
+  ## Returning the result 
   
   return lhs\rhs
 
