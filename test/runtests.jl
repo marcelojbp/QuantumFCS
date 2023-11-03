@@ -1,6 +1,8 @@
 using QuantumFCS
 using Test
+using QuantumOptics 
+using LinearAlgebra
 
 @testset "QuantumFCS.jl" begin
-    # Write your tests here.
+    include("drazin_comparison.jl")
 end
