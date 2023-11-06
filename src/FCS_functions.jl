@@ -113,7 +113,6 @@ function drazin_apply(H::AbstractOperator, J, alphavec::Vector{ComplexF64}, vrho
   # constructing the left hand side consiting of the liouvillian and the unit matrix row 
   lhs = cat(L, vId; dims = 1)
 
-
   # constructing the right hand side of the linear system 
   rhs = append!(alphavec - vrho_ss .* (vId* alphavec), 0)
 
