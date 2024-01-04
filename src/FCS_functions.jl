@@ -57,7 +57,7 @@ function fcscumulants_recursive(H::AbstractOperator, J, mJ, nC::Int64, rho_ss::O
     return vI
     end
 """
-    drazin(H, J; rho_ss = steadystate.eigenvector(H, J))
+    drazin(H, J, vrho_ss, vId, IdL)
     
 Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and jump operators J.
  
@@ -65,8 +65,9 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
 * `H`: Arbitrary operator specifying the Hamiltonian.
 * `J`: Vector containing all jump operators which can be of any arbitrary
          operator type.
-* `rho_ss`: Density matrix specifying the steady-state of the Liouvillian. By default, it is found through steadystate.eigenvector. 
-         For large matrices the steady-state should be provided, as the best steady-state solver could vary.
+* `vrho_ss`: Vectorized density matrix specifying the steady-state of the Liouvillian. 
+* `vId` : Vectorized identity operator  
+* `IdL` : Identity in Liouville space
  """    
     function drazin(H::AbstractOperator, J, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}}, IdL::Matrix{ComplexF64})
         # vectorized liouvillian
@@ -92,19 +93,19 @@ Calculate the vectorized super-operator ℒ(n) = ∑ₖ (νₖ)ⁿ (Lₖ*)⊗L�
     
 """ 
 
-    drazin_apply() 
+    drazin_apply(H, J, valpha, vrho_ss, vId) 
 Calculates the vector resulting from the Drazin inverse being applied to another vector. 
 
 # Arguments 
 * `H`: Arbitrary operator specifying the Hamiltonian.
 * `J`: Vector containing all jump operators which can be of any arbitrary
     operator type.
-* `vrho_ss ` : steady state of the system as a vectorized density matrix
-* `valpha` : input state as a vectorized density matrix
-* `vId`    : vectorized identity operator
+* `vrho_ss ` : Steady state of the system as a vectorized density matrix
+* `valpha` : Input state as a vectorized density matrix
+* `vId`    : Vectorized identity operator
 
 """
-function drazin_apply(H::AbstractOperator, J, alphavec::Vector{ComplexF64}, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}})
+function drazin_apply(H::AbstractOperator, J, valpha::Vector{ComplexF64}, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}})
     ## Constructing the matrix 
 
   # constructing the Liouvillian from the Hamiltonian and the jump operators 
@@ -114,7 +115,7 @@ function drazin_apply(H::AbstractOperator, J, alphavec::Vector{ComplexF64}, vrho
   lhs = cat(L, vId; dims = 1)
 
   # constructing the right hand side of the linear system 
-  rhs = append!(alphavec - vrho_ss .* (vId* alphavec), 0)
+  rhs = append!(valpha - vrho_ss .* (vId* valpha), 0)
 
   ## returning the result 
   
