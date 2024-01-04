@@ -111,7 +111,7 @@ function drazin_apply(H::AbstractOperator, J, valpha::Vector{ComplexF64}, vrho_s
   # constructing the Liouvillian from the Hamiltonian and the jump operators 
   L = Matrix(liouvillian(H, J;).data)
   
-  # constructing the left hand side consiting of the liouvillian and the unit matrix row 
+  # constructing the left hand side consisting of the Liouvillian and the unit matrix row 
   lhs = cat(L, vId; dims = 1)
 
   # constructing the right hand side of the linear system 
