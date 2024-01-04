@@ -10,12 +10,16 @@
         α = Complex((1+im)/sqrt(2)); 
         ρα = coherentstate(basis, α) ⊗ dagger(coherentstate(basis,α));
         valpha = vec(Matrix(ρα.data));
-        rho_ss = steadystate.master(H, J)[2][2];
+        rho_ss = steadystate.iterative(H, J);
         vrho_ss = vec(Matrix(rho_ss.data));
+        l = length(rho_ss)
+
+        # Identity in Liouville space (this will usually be passed from the higher level function)
+        IdL = Matrix{ComplexF64}(I, l, l)
 
         # Defining the vectorized identity (this will usually be passed from the higher level function)
         vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
 
         # testing whether drazin_apply and drazin yield the same result
-        @test norm(drazin_apply(H, J, valpha, vrho_ss, vId)-drazin(H, J; rho_ss)*valpha) ≈ 0 atol=10^(-10)
+        @test norm(drazin_apply(H, J, valpha, vrho_ss, vId)-drazin(H, J, vrho_ss, vId, IdL)*valpha) ≈ 0 atol=10^(-10)
 end
