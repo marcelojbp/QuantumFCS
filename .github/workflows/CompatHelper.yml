@@ -1,4 +1,7 @@
 name: CompatHelper
+permissions:
+  contents: read
+  pages: write          
 on:
   schedule:
     - cron: 0 0 * * *
