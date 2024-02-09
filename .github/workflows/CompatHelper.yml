@@ -1,6 +1,6 @@
 name: CompatHelper
 permissions:
-  contents: read
+  contents: write
   pages: write          
 on:
   schedule:
