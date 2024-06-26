@@ -1,4 +1,5 @@
 /Manifest.toml
 src/untracked_notebook.ipynb
 notebooks/benchmark.jl
+notebooks/QuantumTLM_example.ipynb
 /References
