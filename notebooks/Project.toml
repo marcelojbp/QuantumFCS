@@ -1,0 +1,8 @@
+[deps]
+CairoMakie = "13f3f980-e62b-5c42-98c6-ff1f3baf88f0"
+IterativeSolvers = "42fd0dbc-a981-5370-80f2-aaf504508153"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+QuantumFCS = "f61df7d1-40df-4ff5-bdc9-ea200d60bc8f"
+QuantumOptics = "6e0679c1-51ea-5a7c-ac74-d61b76210b0c"
+SparseArrays = "2f01184e-e22b-5df5-ae63-d93ebab69eaf"

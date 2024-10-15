@@ -12,7 +12,7 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `apply`: Decide whether we use the drazin_apply or not. By default it is set to :true .
 * `iterative`: Further arguments are passed on to the drazin_apply linear solver.
 """
-function fcscumulants_recursive(L::SparseMatrixCSC{ComplexF64, Int64}, mJ::Vector, nC::Int64, rho_ss; apply = :true, nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))), iterative= :true)
+function fcscumulants_recursive(L::SparseMatrixCSC{ComplexF64, Int64}, mJ::Vector, nC::Int64, rho_ss; apply = :true, nu = vcat(fill(+1, Int(length(mJ)/2)),fill(-1, Int(length(mJ)/2))), iterative = :true)
     l = length(rho_ss)
     s = size(rho_ss)
     # Identity in Liouville space
@@ -30,28 +30,15 @@ function fcscumulants_recursive(L::SparseMatrixCSC{ComplexF64, Int64}, mJ::Vecto
     # If we are interested in any higher cumulant we start to use the recursive scheme
     # Initializing the list of "states" used in the recursion
     # We set the first to be the steady-state
-    # vrho[1] = vrho_ss
-    vrho = [vrho_ss for j=1:nC]
-    # vrho[1] = vrho_ss
-    #  We now can compute the Drazin inverse directly or use the drazin_apply function
-    if apply == :false
-        # Computing the Drazin inverse
-        LD = drazin(L, vrho_ss, vId, IdL)
-        for n = 2:nC
-        #Computing the "states" 
-        valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
-        vrho[n] = LD*valpha
-        # and the n-th cumulant
-        append!(vI, real(vId*(sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n))))
-            end
-        else
-        for n = 2:nC
-            # Here we do the same but using the drazin_apply function
-            valpha = sum(binomial(n-1, m)*(vI[m]*IdL*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
-            vrho[n] = drazin_apply(L, valpha, vrho_ss, vId; iterative = iterative)
-            vI[n] = real(vId⋅(sum(binomial(n, m)*Ln[m]*vrho[n+1-m] for m=1:n)))
+    vrho = Vector{SparseVector{ComplexF64, Int64}}(undef, nC)
+    vrho[1] = vrho_ss
+            for n = 2:nC
+                # Here we do the same but using the drazin_apply function
+                valpha = sum(binomial(n-1, m)*(vI[m]*vrho[n-m] - Ln[m]*vrho[n-m]) for m=1:n-1)
+                vrho[n] = drazin_apply(L, valpha, vrho_ss, vId; iterative = iterative)
+                vI[n] = real(sum(binomial(n, m)*vId⋅(Ln[m]*vrho[n+1-m]) for m=1:n))
             end 
-    end
+        # end
 
     return vI
 end
@@ -106,19 +93,14 @@ end
 * `vId`    : vectorized identity operator
 * `iterative` : Optional argument to change the linear system solver. As default set to true (Gauss-Seidel), instead of the usual "/" from LinearAlgebra.
 """
-function drazin_apply(L::SparseMatrixCSC{ComplexF64, Int64}, alphavec::SparseVector, vrho_ss::SparseVector, vId::AbstractMatrix; iterative=:true)
+function drazin_apply(L::SparseMatrixCSC{ComplexF64, Int64}, alphavec::SparseVector, vrho_ss::SparseVector, vId::AbstractMatrix; iterative=:false)
     # constructing the left hand side consiting of the liouvillian and the unit matrix row 
     lhs = cat(L, vId; dims = 1)
     # constructing the right hand side of the linear system 
     alphavecp = alphavec - vrho_ss .* (vId*alphavec)
     j, v = findnz(alphavecp)
     rhs = SparseVector(length(alphavecp)+1, j, v)
-    ## returning the result 
-    # return lhs\Vector(rhs)
-    # return qr(lhs)\rhs
     if iterative == :true
-        # x0, x1 = Krylov.lsmr(lhs, rhs)
-        # return  x0
         return IterativeSolvers.gauss_seidel(lhs, Vector(rhs))
     else
          return  lhs\Vector(rhs)
