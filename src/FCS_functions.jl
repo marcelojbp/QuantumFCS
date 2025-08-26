@@ -6,6 +6,7 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 # Arguments
 * `L`: Vectorized Liouvillean matrix
 * `mJ`: Vector containing the monitored jump matrices.
+* `nC`: Number of cumulants to be calculated.
 * `Jdagger=dagger.(Jdagger)`: Vector containing the hermitian conjugates of the
         jump matrices. If they are not given they are calculated automatically.
 * `nu`: vector of length length(mJ) with weights for each jump matrix. By default down jumps, J, have weight +1 and up-jumps have weight -1.
