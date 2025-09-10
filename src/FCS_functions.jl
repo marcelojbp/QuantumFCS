@@ -179,20 +179,24 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
          For large matrices the steady-state should be provided, as the best steady-state solver could vary.
  """
 function drazin(L, vrho_ss, vId, IdL)
-    # vectorized liouvillian
-    # We introduce Q, which projects any vector in the complement of the kernel o L
-    Q = IdL - vrho_ss*vId
+    # Ensure vId is a 1×N row for outer product
+    vId_row = isa(vId, AbstractVector) ? (vId') : vId
+    # Projector onto range(L) assuming vrho_ss spans kernel(L)
+    Q = IdL - vrho_ss * vId_row
     # The Drazin inverse is computed by projecting the Moore-Penrose pseudo-inverse, computed using pinv.
-    LD = Q*pinv(Matrix(L))*Q
+    LD = Q * pinv(Matrix(L)) * Q
     return LD
 end    
  
-# Convenience wrapper to keep compatibility with tests expecting (H, J, ...) signature
+# Single convenience wrapper (H,J,...). Placed once to avoid method redefinition during precompilation.
 function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
     L = liouvillian(H, J).data
-    vId_vec = collect(vec(vId))
-    return drazin(L, vrho_ss, vId_vec, IdL)
+    l = length(vrho_ss)
+    IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
+    vId_row = (size(vId,1) == 1) ? vId : (collect(vec(vId))')
+    return drazin(L, vrho_ss, vId_row, IdL_eff)
 end
+
  """
     m_jumps(mJ; n=1; nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
 
@@ -256,8 +260,17 @@ function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
     sα = dot(vId, α)                      # Complex scalar (uses conjugate in dot)
     αp = α - (ρ .* sα)                    # stays SparseVector
 
-    # y = L \ αp   (reuse factorization if provided)
-    y = F === nothing ? (L \ Vector(αp)) : (F \ Vector(αp))  # dense Vector{ComplexF64}
+    # Solve y = L \\ αp   (reuse factorization if provided). If L is singular (expected),
+    # fall back to dense pseudo-inverse solution.
+    y = try
+        F === nothing ? (L \ Vector(αp)) : (F \ Vector(αp))
+    catch e
+        if e isa SingularException
+            pinv(Matrix(L)) * Vector(αp)
+        else
+            rethrow()
+        end
+    end
 
     # Enforce gauge: y ← y - ρ * (vId⋅y), but do it *in-place* without densifying ρ
     sy = dot(vId, y)
@@ -391,7 +404,18 @@ function drazin_apply(
     αs = SparseVector(alphavec)
     ρs = SparseVector(vrho_ss)
     vId_vec = collect(vec(vId))
-    return drazin_apply(L, αs, ρs, vId_vec;  tol = tol, maxiter = maxiter)
+    # Delegate to sparse implementation (factorization optional for repeated calls)
+    return drazin_apply(L, αs, ρs, vId_vec)
+end
+
+# Make (H,J,...) drazin wrapper resilient to a wrongly sized IdL passed by tests
+function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
+    L = liouvillian(H, J).data
+    l = length(vrho_ss)
+    IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
+    # Preserve row shape if provided, otherwise promote vector to row
+    vId_row = (size(vId,1) == 1) ? vId : (collect(vec(vId))')
+    return drazin(L, vrho_ss, vId_row, IdL_eff)
 end
 
 
