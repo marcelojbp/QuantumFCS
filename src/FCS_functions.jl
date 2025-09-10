@@ -7,14 +7,14 @@ Calculate n-th zero-frequency cumulant of full counting statistics using a recur
 * `L`: Vectorized Liouvillian matrix (sparse, ComplexF64)
 * `mJ`: Vector containing the monitored jump matrices (sparse operators in vectorized representation).
 * `nC`: Number of cumulants to be calculated.
-* `nu`: Vector of length `length(mJ)` with weights for each jump matrix. By default down jumps have weight +1 and up-jumps have weight -1.
+* `nu`: Vector of length `length(mJ)` with weights for each jump matrix. By default down jumps have weight -1 and up-jumps have weight +1.
 """
 function fcscumulants_recursive(
     L::SparseMatrixCSC{ComplexF64, Int},
     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}},
     nC::Integer,
     rho_ss::SparseMatrixCSC{ComplexF64, Int};
-    nu = vcat(fill(+1, Int(length(mJ) ÷ 2)), fill(-1, Int(length(mJ) ÷ 2))),
+    nu = vcat(fill(-1, Int(length(mJ) ÷ 2)), fill(+1, Int(length(mJ) ÷ 2))),
 )
     # Dimensions
     n = size(rho_ss, 1)           # matrix side
