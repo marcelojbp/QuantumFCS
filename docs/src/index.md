@@ -12,7 +12,7 @@
 As a general scenario, we consider a Lindblad master equation,
 
 $$
-\mathcal{L}\rho = \frac{d \rho}{dt} = -i[H, \rho] + \sum_{k=1}^r L_k \, \rho \, L_k^\dagger - \frac{1}{2}\left\{L^\dagger_k L_k, \rho \right\}.
+\mathcal{L}\rho = \frac{d \rho}{dt} = -i[H, \rho] + \sum_{k=1}^r L_k \, \rho \, L_k^\dagger - \frac{1}{2}\{L^\dagger_k L_k, \rho \}.
 $$
 
 We introduce $p \le r$ counting fields $N_k$ with weights $\nu_k$. This lets us define the total current,
@@ -66,7 +66,7 @@ $$
 $$
 
 $$
-\mathcal{L}^{(n)} = \left.\bigl(-i \, \partial_{\chi}\bigr)^n \mathcal{L}_\chi \right|_{\chi \to 0}~,
+\mathcal{L}^{(n)} = \bigl(-i \, \partial_{\chi}\bigr)^n \mathcal{L}_\chi \Big|_{\chi \to 0}~,
 $$
 
 and $\mathcal{L}^+$ being the Drazin inverse of $\mathcal{L}$.

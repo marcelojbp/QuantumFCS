@@ -30,7 +30,7 @@ and unitful weighs to the monitored jumps
 - `fcscumulants_recursive(H,J, mJ, nC, rho_ss; ...)` – Method for quantum optics---you can pass, instead of the Liouvellean,
 the Hamiltonian and the vector of all jump operators.
 
-*(See the [API docs](https://marcelojbp.github.io/QuantumFCS/dev/) for the full list.)*
+*(See the [API docs](https://marcelojbp.github.io/QuantumFCS) for the full list.)*
 
 ## Installation
 
