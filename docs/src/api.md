@@ -1,6 +1,6 @@
-**`docs/src/api.md`**
+### `docs/src/api.md`
 ```markdown
-# API
+# [API](@id api)
 
 ```@autodocs
 Modules = [QuantumFCS]

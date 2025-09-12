@@ -1,3 +1,4 @@
+# [Quickstart](@id quickstart)
 ```julia
 using QuantumFCS
 
