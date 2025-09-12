@@ -1,5 +1,6 @@
 # [Quickstart](@id quickstart)
-```julia
+
+```jldoctest
 using QuantumFCS
 
 L = #Vectorised Liouvillean
