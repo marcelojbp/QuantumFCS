@@ -25,7 +25,7 @@ jobs:
 
       - name: Instantiate docs environment
         run: |
-          julia --project=docs -e 'using Pkg; Pkg.develop(path=".."); Pkg.instantiate()'
+          julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
 
       - name: Build & deploy docs (Documenter.jl)
         env:
