@@ -7,17 +7,29 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+permissions:
+  contents: write   # allow pushing to gh-pages
+
 jobs:
   docs:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Julia
+        uses: julia-actions/setup-julia@v2
         with:
-          version: '1'
-      - name: Install dependencies
-        run: julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
-      - name: Build and deploy
+          version: '1'   # latest stable 1.x
+
+      - name: Instantiate docs environment
+        run: |
+          julia --project=docs -e 'using Pkg; Pkg.develop(path="."); Pkg.instantiate()'
+
+      - name: Build & deploy docs (Documenter.jl)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: julia --project=docs docs/make.jl
+        run: |
+          julia --project=docs docs/make.jl
+
