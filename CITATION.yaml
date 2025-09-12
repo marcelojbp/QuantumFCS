@@ -1,0 +1,28 @@
+# CITATION.cff
+cff-version: 1.2.0
+message: "If you use QuantumFCS.jl in your research, please cite the software below. Thank you!"
+title: "QuantumFCS.jl: Full counting statistics meets Julia in the quantum realm"
+version: 0.1.0
+authors:
+  - family-names: "Janovitch"
+    given-names: "Marcelo"
+    orcid: "https://orcid.org/0000-0003-3614-0622"
+  - family-names: "Daniel"
+    given-names: "Aaron"
+    orcid: "https://orcid.org/0000-0003-1123-178X"
+repository-code: "https://github.com/marcelojbp/QuantumFCS"
+license: "MIT"
+date-released: 2025-09-12   # update on each tagged release
+
+preferred-citation:
+  type: software
+  title: "QuantumFCS.jl"
+  version: 0.1.0
+  authors:
+    - family-names: "Borges Pereira"
+      given-names: "Marcelo J."
+    - family-names: "Daniel"
+      given-names: "Aaron"
+  year: 2025
+  url: "https://github.com/marcelojbp/QuantumFCS"
+  # doi: "10.5281/zenodo.XXXXXXX"   # add after archiving a release on Zenodo
