@@ -3,7 +3,7 @@
 [![CI](https://github.com/marcelojbp/QuantumFCS/actions/workflows/CI.yml/badge.svg)](https://github.com/marcelojbp/QuantumFCS/actions/workflows/CI.yml)
 [![Docs: dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://marcelojbp.github.io/QuantumFCS/dev/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Cite](https://img.shields.io/badge/cite-CITATION.cff-informational.svg)](CITATION.cff)
+[![Cite](https://img.shields.io/badge/cite-CITATION.bib-informational.svg)](CITATION.bib)
 
 *A Julia package for computing Full Counting Statistics (FCS) of open quantum systems.*
 
@@ -25,7 +25,7 @@ It implements a recursive method in which the $n+1$-th cumulant is computed usin
 
 ### Main function
 - `fcscumulants_recursive(L, mJ, nC, rho_ss; ...)` – compute FCS cumulants up to order `nC`, taking as input 
-a (vectorised) Liouvillean and a vector of monitored jump `mJ`. An optional argument, `nu` can be passed to attribute sign 
+a (vectorised) Liouvillean, `L`, the steady-state `rho_ss`, and a vector of monitored jump `mJ`. An optional argument, `nu` can be passed to attribute sign 
 and unitful weighs to the monitored jumps
 - `fcscumulants_recursive(H,J, mJ, nC, rho_ss; ...)` – Method for quantum optics---you can pass, instead of the Liouvellean,
 the Hamiltonian and the vector of all jump operators.
