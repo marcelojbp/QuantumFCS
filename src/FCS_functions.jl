@@ -210,32 +210,6 @@ function m_jumps(mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}}; n::Inte
     # Sum of sparse Kronecker products stays sparse; element types remain ComplexF64
     return sum(nu[k]^n * kron(conj(mJ[k]), mJ[k]) for k = 1:length(mJ))
 end    
-# """
-#     drazin_apply(L::SparseMatrixCSC{ComplexF64, Int}, alphavec::SparseVector{ComplexF64, Int}, vrho_ss::SparseVector{ComplexF64, Int}, vId::AbstractVector{ComplexF64}; iterative=false, tol=1e-8, maxiter=10_000)
-
-# # Arguments 
-# * `L`: Vectorized Liouvillean
-# * `vrho_ss ` : steady state of the system as a vectorized density matrix
-# * `valpha` : input state as a vectorized density matrix
-# * `vId`    : vectorized identity operator (as a vector)
-# * `iterative` : Optional argument to change the linear system solver. If true, use GMRES from IterativeSolvers; otherwise use the `\` operator.
-# """
-# function drazin_apply(
-#     L::SparseMatrixCSC{ComplexF64, Int},
-#     alphavec::SparseVector{ComplexF64, Int},
-#     vrho_ss::SparseVector{ComplexF64, Int},
-#     vId::AbstractVector{ComplexF64};
-#     # iterative::Bool = false,
-#     tol::Real = 1e-8,
-#     maxiter::Integer = 10_000,
-# )
-#     # Project RHS onto the range of L: α' = α - ρ_ss (vId ⋅ α)
-#     αp = alphavec - vrho_ss .* (dot(vId, alphavec))
-#     # y = L \ αp
-#     y = sparse(L \ Vector(αp))
-#     # Enforce the gauge (normalization) constraint vId ⋅ y = 0
-#     return y - vrho_ss .* (dot(vId, y))
-# end 
 
 """
     drazin_apply(L, α, ρ, vId; F=nothing, rtol=1e-12, atol=0.0)
@@ -408,15 +382,6 @@ function drazin_apply(
     return drazin_apply(L, αs, ρs, vId_vec)
 end
 
-# Make (H,J,...) drazin wrapper resilient to a wrongly sized IdL passed by tests
-function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
-    L = liouvillian(H, J).data
-    l = length(vrho_ss)
-    IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
-    # Preserve row shape if provided, otherwise promote vector to row
-    vId_row = (size(vId,1) == 1) ? vId : (collect(vec(vId))')
-    return drazin(L, vrho_ss, vId_row, IdL_eff)
-end
 
 
 # Old and simpler implementations
