@@ -2,8 +2,8 @@
 
 `QuantumFCS.jl` provides tools for Full Counting Statistics (FCS) of quantum systems.
 
-📘 Start with the [Quickstart](@ref quickstart)
-🧭 Browse the [API](@ref api)
+-📘 Start with the [Quickstart](@ref quickstart)
+-🧭 Browse the [API](@ref api)
 
 # Documentation 
 
@@ -11,15 +11,15 @@
 
 As a general scenario, we consider a Lindblad master equation,
 
-$$
+```math
 \mathcal{L}\rho = \frac{d \rho}{dt} = -i[H, \rho] + \sum_{k=1}^r L_k \, \rho \, L_k^\dagger - \frac{1}{2}\{L^\dagger_k L_k, \rho \}.
-$$
+```
 
 We introduce $p \le r$ counting fields $N_k$ with weights $\nu_k$. This lets us define the total current,
 
-$$
+```math
 N(t) = \sum_k \nu_k \, N_k(t)~.
-$$
+```
 
 We further define the $n$-resolved density matrix $\rho_n(t)$ whose trace equals the probability to have accumulated $n$ jumps at time $t$, $P(n,t) = \operatorname{Tr}[\rho_n(t)]$. Summing over the set of allowed values $\mathcal{N}$ for the total charge $N$, we retrieve the standard density matrix,
 
