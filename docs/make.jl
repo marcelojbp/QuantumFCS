@@ -2,7 +2,6 @@
 
 import Pkg
 Pkg.activate(@__DIR__)    
-Pkg.develop(PackageSpec(path=".."))  # Use the local package
 Pkg.instantiate()
 
 using Documenter
