@@ -163,9 +163,10 @@ function fcscumulants_recursive(
     mJ::AbstractVector{<:Operator},
     nC::Integer,
     rho_ss::AbstractOperator; kargs...)
-    L = liouvillian(H, J).data    
-    return fcscumulants_recursive(L, getfield.(mJ, :data), nC, rho_ss.data; kargs...)
-end    
+    L = liouvillian(H, J).data
+    rho_sparse = issparse(rho_ss) ? rho_ss.data : sparse(rho_ss.data)
+    return fcscumulants_recursive(L, getfield.(mJ, :data), nC, rho_sparse; kargs...)
+end
 """
     drazin(H, J, vrho_ss, vId, IdL)
     
