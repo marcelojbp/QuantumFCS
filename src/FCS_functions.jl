@@ -164,9 +164,13 @@ function fcscumulants_recursive(
     nC::Integer,
     rho_ss::AbstractOperator; kargs...)
     L = liouvillian(H, J).data
+    ## AD: Not ideal for efficieny. Maybe add another wrapper for DenseOperators and one for SparseOperators?
     rho_sparse = issparse(rho_ss) ? rho_ss.data : sparse(rho_ss.data)
     return fcscumulants_recursive(L, getfield.(mJ, :data), nC, rho_sparse; kargs...)
 end
+
+
+
 """
     drazin(H, J, vrho_ss, vId, IdL)
     
