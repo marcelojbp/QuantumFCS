@@ -3,18 +3,17 @@
 `QuantumFCS.jl` provides tools for Full Counting Statistics (FCS) of quantum systems.
 
 -📘 Start with the [Quickstart](@ref quickstart)
+
 -🧭 Browse the [API](@ref api)
 
 # Documentation 
 
-## Introduction 
+## The math behind 
 
 As a general scenario, we consider a Lindblad master equation,
-
 ```math
 \mathcal{L}\rho = \frac{d \rho}{dt} = -i[H, \rho] + \sum_{k=1}^r L_k \, \rho \, L_k^\dagger - \frac{1}{2}\{L^\dagger_k L_k, \rho \}.
 ```
-
 We introduce $p \le r$ counting fields $N_k$ with weights $\nu_k$. This lets us define the total current,
 
 ```math
@@ -89,5 +88,5 @@ QuantumFCS.m_jumps
 QuantumFCS.drazin_apply
 ```
 
-# Examples
+
 
