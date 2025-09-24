@@ -2,7 +2,7 @@
 
 This package provides tools to compute full-counting-statistics cumulants from a Liouvillian.
 
-## Minimal examples
+## Quickstart examples
 
 ```julia
 using QuantumFCS
