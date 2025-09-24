@@ -88,7 +88,7 @@ function fcscumulants_recursive(
     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64,Int}},
     nC::Integer,
     rho_ss::Union{SparseMatrixCSC{ComplexF64,Int}, Matrix{ComplexF64}};
-    nu :: AbstractVector{<:Float64},
+    nu::AbstractVector{<:Float64},
 )
     # Dimensions
     n = size(rho_ss, 1)
