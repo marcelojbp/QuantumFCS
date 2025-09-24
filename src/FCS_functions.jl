@@ -4,10 +4,13 @@
 Calculate n-th zero-frequency cumulant of full counting statistics using a recursive scheme.
 
 # Arguments
-* `L`: Vectorized Liouvillian matrix (sparse, ComplexF64)
+* `L`: Vectorized Liouvillian matrix (sparse or dense, ComplexF64)
+Alternatively, one can provide the Hamiltonian and jump operators instead of `L`
+* `H`: Hamiltonian operator (sparse or dense, Operator from QuantumOptics.jl)
+* `J`: Vector of jump operators (sparse or dense, Operator from QuantumOptics.jl)
 * `mJ`: Vector containing the monitored jump matrices (sparse operators in vectorized representation).
 * `nC`: Number of cumulants to be calculated.
-* `nu`: Vector of length `length(mJ)` with weights for each jump matrix. By default down jumps have weight -1 and up-jumps have weight +1.
+* `nu`: Vector of length `length(mJ)` with weights for each jump.
 """
 function fcscumulants_recursive(
     L::SparseMatrixCSC{ComplexF64, Int},
@@ -16,6 +19,9 @@ function fcscumulants_recursive(
     rho_ss::SparseMatrixCSC{ComplexF64, Int},
     nu::AbstractVector{<:Real},
 )
+    if length(mJ) != length(nu)
+        throw(ArgumentError("Length of mJ ($(length(mJ))) must match length of nu ($(length(nu)))."))
+    end
     # Dimensions
     n = size(rho_ss, 1)           # matrix side
     l = n * n                     # vectorized length
@@ -169,8 +175,6 @@ function fcscumulants_recursive(
     return fcscumulants_recursive(L, getfield.(mJ, :data), nC, sparse(rho_ss.data), nu)
 end
 
-
-
 """
     drazin(H, J, vrho_ss, vId, IdL)
     
@@ -182,6 +186,8 @@ Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and j
          operator type.
 * `rho_ss`: Density matrix specifying the steady-state of the Liouvillian. By default, it is found through steadystate.eigenvector. 
          For large matrices the steady-state should be provided, as the best steady-state solver could vary.
+# Arguments
+    Drazin inverse as a (sparse)
  """
 function drazin(L, vrho_ss, vId, IdL)
     # Ensure vId is a 1×N row for outer product
@@ -209,7 +215,7 @@ Calculate the vectorized super-operator ℒ(n) = ∑ₖ (νₖ)ⁿ (Lₖ*)⊗L�
 # Arguments
 * `mJ`: List of monitored jumps
 * `n` : Power of the weights νₖ. By default set to 1, since this case appears more often.
-* `nu`: vector of length length(mJ) with weights for each jump operator. By default down jumps, J, have weight +1 and up-jumps have weight -1.
+* `nu`: vector of length length(mJ) with weights for each jump operator.
 """
 function m_jumps(mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}}; n::Integer = 1, nu = vcat(fill(+1, Int(length(mJ) ÷ 2)), fill(-1, Int(length(mJ) ÷ 2))))
     # Sum of sparse Kronecker products stays sparse; element types remain ComplexF64
@@ -219,13 +225,20 @@ end
 """
     drazin_apply(L, α, ρ, vId; F=nothing, rtol=1e-12, atol=0.0)
 
-Apply the (projected) Drazin inverse of `L` to `α` by solving a linear system.
-- `L::SparseMatrixCSC{ComplexF64,Int}` (can reuse with `F = factorize(L)`)
-- `α::SparseVector{ComplexF64,Int}`
-- `ρ::SparseVector{ComplexF64,Int}`   (the steady-state vector)
-- `vId::AbstractVector{ComplexF64}`   (gauge vector)
-- `F::Union{Nothing,Factorization}` (optional factorization of `L` to reuse)
-Returns a `SparseVector{ComplexF64,Int}` (type-stable).
+Apply the (projected) Drazin inverse of the Liouvillean `L` to the vector `α` by solving a linear system.
+
+# Arguments
+- `L`: Liouvillean operator (matrix).
+- `α`: Right-hand side vector.
+- `ρ`: Steady-state vector.
+- `vId`: Vectorized identity vector.
+- `F`: Optional factorization of `L` to reuse (default: `nothing`).
+- `rtol`: Relative tolerance for the solver (default: `1e-12`).
+- `atol`: Absolute tolerance for the solver (default: `0.0`).
+
+# Returns
+A (sparse) vector representing the result of applying the projected Drazin inverse.
+
 """
 function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
                       α::SparseVector{ComplexF64,Int},
@@ -315,7 +328,6 @@ function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
     return sparsevec(nzI, nzV, length(y))
 end
 
-
 # vId provided as a 1×N row (e.g., SparseMatrixCSC)
 function drazin_apply(L::SparseMatrixCSC{T,Int},
                       x::AbstractVector{T},
@@ -326,19 +338,6 @@ function drazin_apply(L::SparseMatrixCSC{T,Int},
     return drazin_apply(L, x, vrho_ss, vId_vec)
 end
 
-
-"""
-    drazin_apply(L, α, ρ, vId; F=nothing)
-
-Fast apply of the (projected) Drazin inverse for **dense** L.
-- L :: Matrix{ComplexF64}
-- α :: AbstractVector{ComplexF64}         (dense RHS)
-- ρ :: SparseVector{ComplexF64,Int}       (steady state, sparse)
-- vId :: SparseVector{ComplexF64,Int}     (vectorized identity, sparse)
-- F :: Union{Nothing,LU}                  (cached `lu(L)`)
-
-Returns Vector{ComplexF64} (type-stable, dense).
-"""
 function drazin_apply(L::Matrix{ComplexF64},
                       α::AbstractVector{ComplexF64},
                       ρ::SparseVector{ComplexF64,Int},
@@ -368,7 +367,7 @@ function drazin_apply(L::Matrix{ComplexF64},
     return y  # Vector{ComplexF64}
 end
 
-# Compatibility wrapper for tests: (H, J, ...) signature
+# Compatibility wrapper for tests using QuantumOptics: (H, J, ...) signature
 function drazin_apply(
     H::Operator,
     J,
@@ -386,9 +385,6 @@ function drazin_apply(
     # Delegate to sparse implementation (factorization optional for repeated calls)
     return drazin_apply(L, αs, ρs, vId_vec)
 end
-
-
-
 
 # Old and simpler implementations
 
