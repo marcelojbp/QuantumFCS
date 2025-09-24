@@ -14,7 +14,7 @@ function fcscumulants_recursive(
     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}},
     nC::Integer,
     rho_ss::SparseMatrixCSC{ComplexF64, Int};
-    nu :: AbstractVector{<:Float64},
+    nu :: AbstractVector{<:Real},
 )
     # Dimensions
     n = size(rho_ss, 1)           # matrix side
@@ -88,7 +88,7 @@ function fcscumulants_recursive(
     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64,Int}},
     nC::Integer,
     rho_ss::Union{SparseMatrixCSC{ComplexF64,Int}, Matrix{ComplexF64}};
-    nu::AbstractVector{<:Float64},
+    nu::AbstractVector{<:Real},
 )
     # Dimensions
     n = size(rho_ss, 1)
@@ -163,7 +163,7 @@ function fcscumulants_recursive(
     mJ::AbstractVector{<:Operator},
     nC::Integer,
     rho_ss::AbstractOperator; 
-    nu :: AbstractVector{<:Float64},
+    nu :: AbstractVector{<:Real},
     )
     L = liouvillian(H, J).data
     return fcscumulants_recursive(L, getfield.(mJ, :data), nC, sparse(rho_ss.data), nu)
