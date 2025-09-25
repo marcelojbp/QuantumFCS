@@ -59,7 +59,6 @@ c1, c2, c3 = fcscumulants_recursive(L, mJ, 3, rho_ss, nu)
 
 ```
 
-
 ## Extensions
 For the future,
 

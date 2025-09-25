@@ -1,5 +1,5 @@
+# core API that does not require QuantumOptics
 module QuantumFCS
-    using QuantumOptics
     using LinearAlgebra
     using SparseArrays
     using IterativeSolvers
