@@ -40,7 +40,7 @@ To install the package, in the Julia REPL,
 
 ## Quickstart example
 
-This example requires you to compute provide the vectorised Liouvillean, its steady-state and specify the other inputs as described below
+This example requires you to provide the vectorised Liouvillean, its steady-state and specify other inputs as described below.
 
 ```julia
 using QuantumFCS
