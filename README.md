@@ -62,7 +62,7 @@ c1, c2, c3 = fcscumulants_recursive(L, mJ, 3, rho_ss, nu)
 ## Extensions
 For the future,
 
--Non-Markovian dynamics
--Time-dependent systems
--Computing the FCS distribution numerically
--Integration with other frameworks, such as `QuantumToolbox.jl`
+- Non-Markovian dynamics
+- Time-dependent systems
+- Computing the FCS distribution numerically
+- Integration with other frameworks, such as `QuantumToolbox.jl`
