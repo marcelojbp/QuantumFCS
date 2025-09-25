@@ -14,10 +14,11 @@ To install the package, in the Julia REPL,
 using QuantumFCS
 
 # Build your Liouvillian L and monitored jumps mJ
-# L      :: Complex sparse/dense matrix   (vectorized Liouvillian)
-# mJ     :: Vector of sparse jump super-operators you want to monitor
-# rho_ss :: Steady-state density matrix (matrix, not vectorized)
-# nu     :: Vector of weighs (same length as mJ) for the monitored jumps
+# L     : Complex sparse/dense matrix   (vectorized Liouvillian)
+# mJ    : Vector of sparse jump super-operators you want to monitor
+# nC    : Number of cumulats to be computed
+# rho_ss : Steady-state density matrix (matrix, not vectorized)
+# nu     : Vector of weighs (same length as mJ) for the monitored jumps
 
 mJ = [sqrt(kappa) * a, sqrt(kappa) * a_dagger] #Monitoring loss and injection of photons
 nu = [-1, 1] #We count -1 if we anihilate and +1 if we create
