@@ -1,4 +1,4 @@
-function fcscumulants_recursive(
+function QuantumFCS.fcscumulants_recursive(
     H::Operator,
     J::AbstractVector{<:Operator},
     mJ::AbstractVector{<:Operator},
@@ -11,7 +11,7 @@ function fcscumulants_recursive(
 end
 
 # Single convenience wrapper (H,J,...). Placed once to avoid method redefinition during precompilation.
-function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
+function QuantumFCS.drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
     L = liouvillian(H, J).data
     l = length(vrho_ss)
     IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
@@ -20,7 +20,7 @@ function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, 
 end
 
 # Compatibility wrapper for tests using QuantumOptics: (H, J, ...) signature
-function drazin_apply(
+function QuantumFCS.drazin_apply(
     H::Operator,
     J,
     alphavec::AbstractVector,
