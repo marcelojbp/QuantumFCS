@@ -7,7 +7,7 @@ function QuantumFCS.fcscumulants_recursive(
     nu::AbstractVector{<:Real},
     )
     L = liouvillian(H, J).data
-    return fcscumulants_recursive(L, getfield.(mJ, :data), nC, sparse(rho_ss.data), nu)
+    return QuantumFCS.fcscumulants_recursive(L, getfield.(mJ, :data), nC, sparse(rho_ss.data), nu)
 end
 
 # Single convenience wrapper (H,J,...). Placed once to avoid method redefinition during precompilation.
@@ -16,7 +16,7 @@ function QuantumFCS.drazin(H::Operator, J, vrho_ss::AbstractVector, vId::Abstrac
     l = length(vrho_ss)
     IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
     vId_row = (size(vId,1) == 1) ? vId : (collect(vec(vId))')
-    return drazin(L, vrho_ss, vId_row, IdL_eff)
+    return QuantumFCS.drazin(L, vrho_ss, vId_row, IdL_eff)
 end
 
 # Compatibility wrapper for tests using QuantumOptics: (H, J, ...) signature
@@ -35,5 +35,5 @@ function QuantumFCS.drazin_apply(
     ρs = SparseVector(vrho_ss)
     vId_vec = collect(vec(vId))
     # Delegate to sparse implementation (factorization optional for repeated calls)
-    return drazin_apply(L, αs, ρs, vId_vec)
+    return QuantumFCS.drazin_apply(L, αs, ρs, vId_vec)
 end
