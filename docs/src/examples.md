@@ -2,6 +2,7 @@
 
 ## Examples
 
+```julia
 using QuantumOptics
 using QuantumFCS
 
@@ -49,3 +50,5 @@ println("\nFull Counting Statistics:")
 println("First cumulant (mean photon flux): $c1")
 println("Second cumulant (variance): $c2") 
 println("Third cumulant (skewness): $c3")
+
+```
