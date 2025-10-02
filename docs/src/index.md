@@ -6,6 +6,8 @@
 
 -🧭 Browse the [API](@ref api)
 
+-📝 Study the [Examples](@ref examples)
+
 # Documentation 
 
 ## The math behind 
