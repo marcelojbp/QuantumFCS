@@ -4,10 +4,13 @@
 Calculate n-th zero-frequency cumulant of full counting statistics using a recursive scheme.
 
 # Arguments
-* `L`: Vectorized Liouvillian matrix (sparse, ComplexF64)
+* `L`: Vectorized Liouvillian matrix (sparse or dense, ComplexF64)
+Alternatively, one can provide the Hamiltonian and jump operators instead of `L`
+* `H`: Hamiltonian operator (sparse or dense, Operator from QuantumOptics.jl)
+* `J`: Vector of jump operators (sparse or dense, Operator from QuantumOptics.jl)
 * `mJ`: Vector containing the monitored jump matrices (sparse operators in vectorized representation).
 * `nC`: Number of cumulants to be calculated.
-* `nu`: Vector of length `length(mJ)` with weights for each jump matrix. By default down jumps have weight -1 and up-jumps have weight +1.
+* `nu`: Vector of length `length(mJ)` with weights for each jump.
 """
 function fcscumulants_recursive(
     L::SparseMatrixCSC{ComplexF64, Int},
@@ -16,6 +19,9 @@ function fcscumulants_recursive(
     rho_ss::SparseMatrixCSC{ComplexF64, Int},
     nu::AbstractVector{<:Real},
 )
+    if length(mJ) != length(nu)
+        throw(ArgumentError("Length of mJ ($(length(mJ))) must match length of nu ($(length(nu)))."))
+    end
     # Dimensions
     n = size(rho_ss, 1)           # matrix side
     l = n * n                     # vectorized length
@@ -82,7 +88,7 @@ function fcscumulants_recursive(
 
     return vI
 end
-
+# Dense method
 function fcscumulants_recursive(
     L::Matrix{ComplexF64},
     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64,Int}},
@@ -157,31 +163,19 @@ function fcscumulants_recursive(
     return vI
 end
 
-function fcscumulants_recursive(
-    H::Operator,
-    J::AbstractVector{<:Operator},
-    mJ::AbstractVector{<:Operator},
-    nC::Integer,
-    rho_ss::AbstractOperator,
-    nu::AbstractVector{<:Real},
-    )
-    L = liouvillian(H, J).data
-    return fcscumulants_recursive(L, getfield.(mJ, :data), nC, sparse(rho_ss.data), nu)
-end
-
-
-
 """
-    drazin(H, J, vrho_ss, vId, IdL)
+    drazin(L, vrho_ss, vId, IdL)
     
 Calculate the Drazin inverse of a Liouvillian defined by the Hamiltonian H and jump operators J.
  
 # Arguments
-* `H`: Arbitrary operator specifying the Hamiltonian.
-* `J`: Vector containing all jump operators which can be of any arbitrary
-         operator type.
-* `rho_ss`: Density matrix specifying the steady-state of the Liouvillian. By default, it is found through steadystate.eigenvector. 
-         For large matrices the steady-state should be provided, as the best steady-state solver could vary.
+* `L` : Liouvillian matrix
+* `vrho_ss`: vectorised density matrix specifying the steady-state of the Liouvillian.
+* `vId`: vectorised identity matrix (1×N row or vector)
+* `IdL`: Identity matrix in Liouville space (N×N)
+
+# Returns
+    Drazin inverse as a (sparse)
  """
 function drazin(L, vrho_ss, vId, IdL)
     # Ensure vId is a 1×N row for outer product
@@ -193,15 +187,6 @@ function drazin(L, vrho_ss, vId, IdL)
     return LD
 end    
  
-# Single convenience wrapper (H,J,...). Placed once to avoid method redefinition during precompilation.
-function drazin(H::Operator, J, vrho_ss::AbstractVector, vId::AbstractVecOrMat, IdL::AbstractMatrix)
-    L = liouvillian(H, J).data
-    l = length(vrho_ss)
-    IdL_eff = (size(IdL,1) == l && size(IdL,2) == l) ? IdL : Matrix{eltype(L)}(I, l, l)
-    vId_row = (size(vId,1) == 1) ? vId : (collect(vec(vId))')
-    return drazin(L, vrho_ss, vId_row, IdL_eff)
-end
-
  """
     m_jumps(mJ; n=1; nu = vcat(fill(-1, Int(length(J)/2)),fill(1, Int(length(J)/2))))
 
@@ -209,7 +194,7 @@ Calculate the vectorized super-operator ℒ(n) = ∑ₖ (νₖ)ⁿ (Lₖ*)⊗L�
 # Arguments
 * `mJ`: List of monitored jumps
 * `n` : Power of the weights νₖ. By default set to 1, since this case appears more often.
-* `nu`: vector of length length(mJ) with weights for each jump operator. By default down jumps, J, have weight +1 and up-jumps have weight -1.
+* `nu`: vector of length length(mJ) with weights for each jump operator.
 """
 function m_jumps(mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}}; n::Integer = 1, nu = vcat(fill(+1, Int(length(mJ) ÷ 2)), fill(-1, Int(length(mJ) ÷ 2))))
     # Sum of sparse Kronecker products stays sparse; element types remain ComplexF64
@@ -219,13 +204,20 @@ end
 """
     drazin_apply(L, α, ρ, vId; F=nothing, rtol=1e-12, atol=0.0)
 
-Apply the (projected) Drazin inverse of `L` to `α` by solving a linear system.
-- `L::SparseMatrixCSC{ComplexF64,Int}` (can reuse with `F = factorize(L)`)
-- `α::SparseVector{ComplexF64,Int}`
-- `ρ::SparseVector{ComplexF64,Int}`   (the steady-state vector)
-- `vId::AbstractVector{ComplexF64}`   (gauge vector)
-- `F::Union{Nothing,Factorization}` (optional factorization of `L` to reuse)
-Returns a `SparseVector{ComplexF64,Int}` (type-stable).
+Apply the (projected) Drazin inverse of the Liouvillean `L` to the vector `α` by solving a linear system.
+
+# Arguments
+- `L`: Liouvillean operator (matrix).
+- `α`: Right-hand side vector.
+- `ρ`: Steady-state vector.
+- `vId`: Vectorized identity vector.
+- `F`: Optional factorization of `L` to reuse (default: `nothing`).
+- `rtol`: Relative tolerance for the solver (default: `1e-12`).
+- `atol`: Absolute tolerance for the solver (default: `0.0`).
+
+# Returns
+A (sparse) vector representing the result of applying the projected Drazin inverse.
+
 """
 function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
                       α::SparseVector{ComplexF64,Int},
@@ -315,7 +307,6 @@ function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
     return sparsevec(nzI, nzV, length(y))
 end
 
-
 # vId provided as a 1×N row (e.g., SparseMatrixCSC)
 function drazin_apply(L::SparseMatrixCSC{T,Int},
                       x::AbstractVector{T},
@@ -326,19 +317,6 @@ function drazin_apply(L::SparseMatrixCSC{T,Int},
     return drazin_apply(L, x, vrho_ss, vId_vec)
 end
 
-
-"""
-    drazin_apply(L, α, ρ, vId; F=nothing)
-
-Fast apply of the (projected) Drazin inverse for **dense** L.
-- L :: Matrix{ComplexF64}
-- α :: AbstractVector{ComplexF64}         (dense RHS)
-- ρ :: SparseVector{ComplexF64,Int}       (steady state, sparse)
-- vId :: SparseVector{ComplexF64,Int}     (vectorized identity, sparse)
-- F :: Union{Nothing,LU}                  (cached `lu(L)`)
-
-Returns Vector{ComplexF64} (type-stable, dense).
-"""
 function drazin_apply(L::Matrix{ComplexF64},
                       α::AbstractVector{ComplexF64},
                       ρ::SparseVector{ComplexF64,Int},
@@ -368,100 +346,4 @@ function drazin_apply(L::Matrix{ComplexF64},
     return y  # Vector{ComplexF64}
 end
 
-# Compatibility wrapper for tests: (H, J, ...) signature
-function drazin_apply(
-    H::Operator,
-    J,
-    alphavec::AbstractVector,
-    vrho_ss::AbstractVector,
-    vId::AbstractVecOrMat;
-    # iterative::Bool = false,
-    tol::Real = 1e-8,
-    maxiter::Integer = 10_000,
-)
-    L = liouvillian(H, J).data
-    αs = SparseVector(alphavec)
-    ρs = SparseVector(vrho_ss)
-    vId_vec = collect(vec(vId))
-    # Delegate to sparse implementation (factorization optional for repeated calls)
-    return drazin_apply(L, αs, ρs, vId_vec)
-end
 
-
-
-
-# Old and simpler implementations
-
-# function drazin_apply(H::AbstractOperator, J, alphavec::Vector{ComplexF64}, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}})
-#     ## Constructing the matrix 
-
-#   # constructing the Liouvillian from the Hamiltonian and the jump operators 
-#   L = Matrix(liouvillian(H, J;).data)
-  
-#   # constructing the left hand side consiting of the liouvillian and the unit matrix row 
-#   lhs = cat(L, vId; dims = 1)
-
-#   # constructing the right hand side of the linear system 
-#   rhs = append!(alphavec - vrho_ss .* (vId* alphavec), 0)
-
-#   ## returning the result 
-  
-#   return lhs\rhs
-
-# end 
-
-
-
-# function drazin(H::AbstractOperator, J, vrho_ss::Vector{ComplexF64}, vId::Adjoint{ComplexF64, Vector{ComplexF64}}, IdL::Matrix{ComplexF64})
-#     # vectorized liouvillian
-#     L = Matrix(liouvillian(H, J).data)
-#     # We introduce Q, which projects any vector in the complement of the kernel o L
-#     Q = IdL - vrho_ss*vId
-#     # The Drazin inverse is computed by projecting the Moore-Penrose pseudo-inverse, computed using pinv.
-#     LD = Q*pinv(L)*Q
-#     return LD
-# end
-
-
-# function fcscumulants_recursive(
-#     L::SparseMatrixCSC{ComplexF64, Int},
-#     mJ::AbstractVector{<:SparseMatrixCSC{ComplexF64, Int}},
-#     nC::Integer,
-#     rho_ss::SparseMatrixCSC{ComplexF64, Int};
-#     # rho_ss::Matrix{ComplexF64};
-#     nu = vcat(fill(+1, Int(length(mJ) ÷ 2)), fill(-1, Int(length(mJ) ÷ 2))),
-#     # iterative::Bool = false,
-#     )
-#     l = length(rho_ss)
-#     s = size(rho_ss)
-#     # Caches the LU-factorisation of the Liouvillean
-#     F = lu(L)
-#     # Identity in Liouville space
-#     IdL = spdiagm(ComplexF64.(ones(l)))
-#     # Vectorired identity operator
-#     # Keep as a vector for type-stable dot products and to avoid dense row materialization
-#     vId = SparseVector(vec(spdiagm(ComplexF64.(ones(s[1])))))
-#     # Jump d/dχ n-derivatives, ℒ(n)
-#     Ln = [m_jumps(mJ; n = k, nu = nu) for k=1:nC]
-#     # Vectorized steady-state
-#     # As in Flindt's paper, we enforce normalisation of the steady state
-#     vrho_ss = SparseVector(vec(rho_ss./tr(rho_ss)))
-#     # Empty list which will collect the cumulants
-#     vI = Vector{Float64}(undef, nC)
-#     # First cumulant, computed directly
-#     vI[1] = real(dot(vId, Ln[1] * vrho_ss))
-#     # If we are interested in any higher cumulant we start to use the recursive scheme
-#     # Initializing the list of "states" used in the recursion
-#     # We set the first to be the steady-state
-#     vrho = Vector{SparseVector{ComplexF64, Int}}(undef, nC)
-#     vrho[1] = vrho_ss
-#             for n = 2:nC
-#                 # Here we do the same but using the drazin_apply function
-#                 valpha = sum(binomial(n-1, m) * (vI[m] * vrho[n-m] - Ln[m] * vrho[n-m]) for m = 1:n-1)
-#                 vrho[n] = drazin_apply(L, valpha, vrho_ss, vId; F = F)
-#                 vI[n] = real(sum(binomial(n, m) * dot(vId, Ln[m] * vrho[n+1-m]) for m = 1:n))
-#             end 
-#         # end
-
-#     return vI
-# end

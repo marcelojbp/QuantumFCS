@@ -33,23 +33,36 @@ the Hamiltonian and the vector of all jump operators.
 *(See the [API docs](https://marcelojbp.github.io/QuantumFCS) for the full list.)*
 
 ## Installation
-
-Until registration, install directly from GitHub:
-
+To install the package, in the Julia REPL, 
 ```julia
 ] add https://github.com/marcelojbp/QuantumFCS
 ```
-### Quickstart
+
+## Quickstart example
+
+This example requires you to provide the vectorised Liouvillean, its steady-state and specify other inputs as described below.
+
 ```julia
 using QuantumFCS
 
-L = #Vectorised Liouvillean
-rho_ss = #Steady-state (0-th eigenvalue of the L)
+# Build your Liouvillian L and monitored jumps mJ
+# L     : Complex sparse/dense matrix   (vectorized Liouvillian)
+# mJ    : Vector of sparse jump super-operators you want to monitor
+# nC    : Number of cumulats to be computed
+# rho_ss : Steady-state density matrix (matrix, not vectorized)
+# nu     : Vector of weighs (same length as mJ) for the monitored jumps
 
+mJ = [sqrt(kappa) * a, sqrt(kappa) * a_dagger] #Monitoring loss and injection of photons
+nu = [-1, 1] #We count -1 if we anihilate and +1 if we create
 # compute first 3 cumulants
-avg, var, skw = fcscumulants_recursive(L, J, 3, rho_ss)
+c1, c2, c3 = fcscumulants_recursive(L, mJ, 3, rho_ss, nu)
+
 ```
 
+## Extensions
+For the future,
 
-
-<!-- [![Build Status](https://github.com/aarondanielphysics/QuantumFCS.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/aarondanielphysics/QuantumFCS.jl/actions/workflows/CI.yml?query=branch%3Amain) -->
+- Non-Markovian dynamics
+- Time-dependent systems
+- Computing the FCS distribution numerically
+- Integration with other frameworks, such as `QuantumToolbox.jl`
