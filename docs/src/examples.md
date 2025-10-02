@@ -1,12 +1,15 @@
 # [Examples](@id examples)
 
-## Examples
+## Driven cavity  
 
 ```julia
 using QuantumOptics
 using QuantumFCS
+```
 
-## Simple driven cavity setup
+Define parameters and system 
+
+```julia
 
 # Define the Hilbert space dimension 
 N = 10  # Fock space cutoff
@@ -39,11 +42,18 @@ mJ = [sqrt(κ) * a]
 # Initial state (vacuum state)
 ψ0 = fockstate(basis, 0)
 ρ0 = dm(ψ0)
+```
 
-# Calculate steady state
+Determine the steady state 
+
+```julia
 ρss = steadystate.iterative(H, J);
 
-# Calculate the first three cumulants using FCS
+```
+
+Compute the first three cumulants
+
+```julia
 c1, c2, c3 = fcscumulants_recursive(H, J, mJ, 3, ρss, nu)
 
 println("\nFull Counting Statistics:")
