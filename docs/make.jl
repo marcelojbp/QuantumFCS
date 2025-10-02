@@ -18,6 +18,7 @@ makedocs(
         "Home"       => "index.md",
         "Quickstart" => "quickstart.md",
         "API"        => "api.md",
+        "Examples"   => "examples.md",
     ],
 )
 
