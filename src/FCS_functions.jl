@@ -27,7 +27,15 @@ function fcscumulants_recursive(
     l = n * n                     # vectorized length
 
     # Cached factorization of Liouvillian
-    F = lu(L)
+    F = try
+        lu(L)
+    catch e
+        if e isa SingularException
+            nothing
+        else
+            rethrow()
+        end
+    end
 
     # Vectorized identity (diagonal entries of an n×n identity under vec)
     # Indices: 1:(n+1):l in column-major vectorization
@@ -75,7 +83,7 @@ function fcscumulants_recursive(
         end
 
         # y_n = L^D * valpha  (project+gauge inside drazin_apply), sparse result
-        vrho[ncur] = drazin_apply(L, αbuf, vrho_ss, vId; F = F, rtol = 1e-12)
+        vrho[ncur] = drazin_apply(L, αbuf, vrho_ss, vId; rtol = 1e-12)
 
         # I_n = Re( Σ_{m=1}^n binom(n,m) * vId⋅(Ln[m] * vrho[n+1-m]) )
         acc = 0.0
@@ -100,9 +108,17 @@ function fcscumulants_recursive(
     n = size(rho_ss, 1)
     l = n*n
 
-    # Factorize dense L once (pivoted LU)
-    F = lu(L)
-
+    # Factorize dense L once (pivoted LU, with protection from singular exceptions)
+    F = try
+        lu(L)
+    catch e
+        if e isa SingularException
+            nothing
+        else
+            rethrow()
+        end
+    end
+    
     # Vectorized identity as a sparse vector: indices 1:(n+1):l (column-major)
     diag_idx = collect(1:(n+1):l)
     vId = SparseVector{ComplexF64,Int}(l, diag_idx, fill(1.0 + 0.0im, n))
@@ -149,7 +165,7 @@ function fcscumulants_recursive(
         end
 
         # y_n = L^D * valpha  (project+gauge inside drazin_apply)
-        vρ[ncur] = drazin_apply(L, αbuf, SparseVector(vrho1_dense), vId; F = F)
+        vρ[ncur] = drazin_apply(L, αbuf, SparseVector(vrho1_dense), vId)
 
         # I_n = Re( Σ_{m=1}^n C(n,m) * vId⋅(Ln[m] * vρ[n+1-m]) )
         acc = 0.0
@@ -223,7 +239,7 @@ function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
                       α::SparseVector{ComplexF64,Int},
                       ρ::SparseVector{ComplexF64,Int},
                       vId::AbstractVector{ComplexF64};
-                      F::Union{Nothing,Factorization}=nothing,
+                      F::Union{Nothing, Factorization}=nothing,
                       rtol::Float64=1e-12,
                       atol::Float64=0.0)
 
@@ -281,11 +297,19 @@ function drazin_apply(L::SparseMatrixCSC{ComplexF64,Int},
         y[i] -= sα * nonzeros(ρ)[k]
     end
 
-    # Solve once (reuse factorization if given)
-    if F === nothing
-        y = L \ y
-    else
-        y = F \ y
+    # Solve once (reuse factorization if given). If L is singular, fall back to dense pseudo-inverse.
+    y = try
+        if F === nothing
+            L \ y
+        else
+            F \ y
+        end
+    catch e
+        if e isa SingularException
+            pinv(Matrix(L)) * y
+        else
+            rethrow()
+        end
     end
 
     # Enforce gauge: y ← y - ρ * (vId⋅y)
@@ -321,7 +345,7 @@ function drazin_apply(L::Matrix{ComplexF64},
                       α::AbstractVector{ComplexF64},
                       ρ::SparseVector{ComplexF64,Int},
                       vId::SparseVector{ComplexF64,Int};
-                      F::Union{Nothing,LU}=nothing)
+                      F::Union{Nothing, Factorization}=nothing)
 
     @assert size(L,1) == size(L,2) == length(α) == length(vId)
 
