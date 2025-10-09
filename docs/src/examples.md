@@ -8,6 +8,7 @@ We study a quantum dot coupled to two fermionic reservoirs, for details on the m
 using QuantumFCS, LinearAlgebra, SparseArrays
 
 ```
+
 Define parameters and system
 
 ```julia
@@ -50,7 +51,7 @@ L += (-1/2 * kron(id,Jcloss'*Jcloss)
      -1/2 * kron(transpose(Jhloss'*Jhloss),id)
      -1/2 * kron(id,Jhgain'*Jhgain) 
      -1/2 * kron(transpose(Jhgain'*Jhgain),id))  
- ```  
+```  
 
  and determine the steady state 
 
@@ -82,8 +83,8 @@ mJ = [Jcloss];
 # Computing the first two cumulants
 c1, c2 = fcscumulants_recursive(L, mJ, 2, sparse(ρ_ss), nu);
 println("\nFull Counting Statistics (numerics):")
-println("First cumulant : $c1")
-println("Second cumulant : $c2") 
+println("First cumulant : \$c1")
+println("Second cumulant : \$c2") 
 ```
 
 ```julia
@@ -98,9 +99,10 @@ In the large bias regime we have the following analytical solutions [Patrick P. 
 c1_analytical = κc*κh/(κc+κh);
 c2_analytical = (κh^2+κc^2)/(κc+κh)^2*c1_analytical;
 println("\nFull Counting Statistics (analytical):")
-println("First cumulant : $c1_analytical")
-println("Second cumulant : $c2_analytical") 
+println("First cumulant : \$c1_analytical")
+println("Second cumulant : \$c2_analytical") 
 ```  
+
 ```julia
 Full Counting Statistics (analytical):
 First cumulant : 0.08333333333333334
@@ -166,9 +168,14 @@ Compute the first three cumulants
 c1, c2, c3 = fcscumulants_recursive(H, J, mJ, 3, ρss, nu)
 
 println("\nFull Counting Statistics:")
-println("First cumulant (mean photon flux): $c1")
-println("Second cumulant (variance): $c2") 
-println("Third cumulant (skewness): $c3")
-
+println("First cumulant (mean photon flux): \$c1")
+println("Second cumulant (variance): \$c2") 
+println("Third cumulant (skewness): \$c3")
 ```
 
+```julia
+Full Counting Statistics:
+First cumulant (mean photon flux): -0.02104572040194588
+Second cumulant (variance): 0.012890993774510551
+Third cumulant (skewness): 0.011185533737017767
+```
