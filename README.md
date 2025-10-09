@@ -12,7 +12,7 @@
 **QuantumFCS.jl** provides tools to study **Full Counting Statistics** (FCS) of quantum transport and quantum optics models based on Lindblad master equations. 
 It implements a recursive method in which the $n+1$-th cumulant is computed using the $n$-th and the application of the Drazin inverse of the Liouvillean.
 
-- The package follows approach introduced in [Flindt et al., Phys. Rev. B 82, 155407 (2010)](https://arxiv.org/abs/1002.4506), focusing on Markovian dynamics.  
+- The package follows the approach introduced in [Flindt et al., Phys. Rev. B 82, 155407 (2010)](https://arxiv.org/abs/1002.4506), focusing on Markovian dynamics.  
 - It is designed for efficient numerical calculations using sparse or dense linear algebra.
 
 ## Features
@@ -40,7 +40,7 @@ To install the package, in the Julia REPL,
 
 ## Quickstart example
 
-This example requires you to provide the vectorised Liouvillean, its steady-state and specify other inputs as described below.
+This example requires you to provide the vectorised Liouvillian, its steady-state and specify other inputs as described below.
 
 ```julia
 using QuantumFCS
