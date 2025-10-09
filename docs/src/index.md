@@ -10,7 +10,7 @@
 
 # Documentation 
 
-## The math behind 
+## Mathematical Background
 
 As a general scenario, we consider a Lindblad master equation,
 ```math
