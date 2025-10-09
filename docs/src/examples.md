@@ -83,8 +83,8 @@ mJ = [Jcloss];
 # Computing the first two cumulants
 c1, c2 = fcscumulants_recursive(L, mJ, 2, sparse(ρ_ss), nu);
 println("\nFull Counting Statistics (numerics):")
-println("First cumulant : \$c1")
-println("Second cumulant : \$c2") 
+println("First cumulant : $c1")
+println("Second cumulant : $c2") 
 ```
 
 ```julia
@@ -99,8 +99,8 @@ In the large bias regime we have the following analytical solutions [Patrick P. 
 c1_analytical = κc*κh/(κc+κh);
 c2_analytical = (κh^2+κc^2)/(κc+κh)^2*c1_analytical;
 println("\nFull Counting Statistics (analytical):")
-println("First cumulant : \$c1_analytical")
-println("Second cumulant : \$c2_analytical") 
+println("First cumulant : $c1_analytical")
+println("Second cumulant : $c2_analytical") 
 ```  
 
 ```julia
@@ -168,9 +168,9 @@ Compute the first three cumulants
 c1, c2, c3 = fcscumulants_recursive(H, J, mJ, 3, ρss, nu)
 
 println("\nFull Counting Statistics:")
-println("First cumulant (mean photon flux): \$c1")
-println("Second cumulant (variance): \$c2") 
-println("Third cumulant (skewness): \$c3")
+println("First cumulant (mean photon flux): $c1")
+println("Second cumulant (variance): $c2") 
+println("Third cumulant (skewness): $c3")
 ```
 
 ```julia

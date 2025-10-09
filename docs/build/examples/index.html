@@ -49,14 +49,14 @@ nu = [1];
 mJ = [Jcloss];</code></pre><pre><code class="language-julia hljs"># Computing the first two cumulants
 c1, c2 = fcscumulants_recursive(L, mJ, 2, sparse(ρ_ss), nu);
 println(&quot;\nFull Counting Statistics (numerics):&quot;)
-println(&quot;First cumulant : \$c1&quot;)
-println(&quot;Second cumulant : \$c2&quot;) </code></pre><pre><code class="language-julia hljs">Full Counting Statistics (numerics):
+println(&quot;First cumulant : $c1&quot;)
+println(&quot;Second cumulant : $c2&quot;) </code></pre><pre><code class="language-julia hljs">Full Counting Statistics (numerics):
 First cumulant : 0.08333333333333334
 Second cumulant : 0.06018518518518519</code></pre><p>In the large bias regime we have the following analytical solutions <a href="https://arxiv.org/pdf/2406.19206">Patrick P. Potts, 2024</a></p><pre><code class="language-julia hljs">c1_analytical = κc*κh/(κc+κh);
 c2_analytical = (κh^2+κc^2)/(κc+κh)^2*c1_analytical;
 println(&quot;\nFull Counting Statistics (analytical):&quot;)
-println(&quot;First cumulant : \$c1_analytical&quot;)
-println(&quot;Second cumulant : \$c2_analytical&quot;) </code></pre><pre><code class="language-julia hljs">Full Counting Statistics (analytical):
+println(&quot;First cumulant : $c1_analytical&quot;)
+println(&quot;Second cumulant : $c2_analytical&quot;) </code></pre><pre><code class="language-julia hljs">Full Counting Statistics (analytical):
 First cumulant : 0.08333333333333334
 Second cumulant : 0.0601851851851852</code></pre><h2 id="Driven-cavity"><a class="docs-heading-anchor" href="#Driven-cavity">Driven cavity</a><a id="Driven-cavity-1"></a><a class="docs-heading-anchor-permalink" href="#Driven-cavity" title="Permalink"></a></h2><p>We study a simple driven cavity using the <em>QuantumOptics.jl</em> package to model the system</p><pre><code class="language-julia hljs">using QuantumOptics
 using QuantumFCS</code></pre><p>Define parameters and system </p><pre><code class="language-julia hljs">
@@ -94,9 +94,9 @@ mJ = [sqrt(κ) * a]
 </code></pre><p>Compute the first three cumulants</p><pre><code class="language-julia hljs">c1, c2, c3 = fcscumulants_recursive(H, J, mJ, 3, ρss, nu)
 
 println(&quot;\nFull Counting Statistics:&quot;)
-println(&quot;First cumulant (mean photon flux): \$c1&quot;)
-println(&quot;Second cumulant (variance): \$c2&quot;) 
-println(&quot;Third cumulant (skewness): \$c3&quot;)</code></pre><pre><code class="language-julia hljs">Full Counting Statistics:
+println(&quot;First cumulant (mean photon flux): $c1&quot;)
+println(&quot;Second cumulant (variance): $c2&quot;) 
+println(&quot;Third cumulant (skewness): $c3&quot;)</code></pre><pre><code class="language-julia hljs">Full Counting Statistics:
 First cumulant (mean photon flux): -0.02104572040194588
 Second cumulant (variance): 0.012890993774510551
-Third cumulant (skewness): 0.011185533737017767</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.1 on <span class="colophon-date" title="Thursday 9 October 2025 18:46">Thursday 9 October 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+Third cumulant (skewness): 0.011185533737017767</code></pre></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../api/">« API</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="auto">Automatic (OS)</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.1.1 on <span class="colophon-date" title="Thursday 9 October 2025 18:50">Thursday 9 October 2025</span>. Using Julia version 1.11.7.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
