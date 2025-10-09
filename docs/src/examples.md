@@ -2,7 +2,7 @@
 
 ## Quantum dot heat engine 
 
-We study a quantum dot coupled to two fermionic reservoirs, for details see [Patrick P. Potts, 2024](https://arxiv.org/pdf/2406.19206). 
+We study a quantum dot coupled to two fermionic reservoirs, for details on the model see [Patrick P. Potts, 2024](https://arxiv.org/pdf/2406.19206). 
 
 ```julia
 using QuantumFCS, LinearAlgebra, SparseArrays
@@ -108,6 +108,8 @@ Second cumulant : 0.0601851851851852
 ``` 
 
 ## Driven cavity  
+
+We study a simple driven cavity using the *QuantumOptics.jl* package to model the system
 
 ```julia
 using QuantumOptics
