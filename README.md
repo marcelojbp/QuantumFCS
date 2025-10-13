@@ -27,7 +27,7 @@ It implements a recursive method in which the $n+1$-th cumulant is computed usin
 - `fcscumulants_recursive(L, mJ, nC, rho_ss; ...)` – compute FCS cumulants up to order `nC`, taking as input 
 a (vectorised) Liouvillean, `L`, the steady-state `rho_ss`, a vector of monitored jumps `mJ`, and a vector `nu` to attribute sign 
 and unitful weighs to the monitored jumps.
-- `fcscumulants_recursive(H,J, mJ, nC, rho_ss; ...)` – Method for quantum optics---you can pass, instead of the Liouvellean,
+- `fcscumulants_recursive(H,J, mJ, nC, rho_ss; ...)` – Method for quantum optics---you can pass, instead of the Liouvillean,
 the Hamiltonian and the vector of all jump operators.
 
 *(See the [API docs](https://marcelojbp.github.io/QuantumFCS) for the full list.)*
@@ -40,7 +40,7 @@ To install the package, in the Julia REPL,
 
 ## Quickstart example
 
-This example requires you to provide the vectorised Liouvillian, its steady-state and specify other inputs as described below.
+This example requires you to provide the vectorised Liouvillean, its steady-state and specify other inputs as described below.
 
 ```julia
 using QuantumFCS
