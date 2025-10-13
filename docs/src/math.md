@@ -10,6 +10,7 @@ We introduce $p \le r$ counting fields $N_k$ with weights $\nu_k$. This lets us 
 ```math
 N(t) = \sum_k \nu_k \, N_k(t)~.
 ```
+Above, $\nu_k$ can be simply integers, e.g. $\pm 1$ to count electrons/photons, or have units to count electric charges ($e$) and  stochastic heat/work (energy). 
 
 We further define the $n$-resolved density matrix $\rho_n(t)$ whose trace equals the probability to have accumulated $n$ jumps at time $t$, $P(n,t) = \operatorname{Tr}[\rho_n(t)]$. Summing over the set of allowed values $\mathcal{N}$ for the total charge $N$, we retrieve the standard density matrix,
 
@@ -60,3 +61,13 @@ with the constituents,
 ```
 
 and $\mathcal{L}^+$ being the Drazin inverse of $\mathcal{L}$.
+
+## References
+
+- **FCS in Lindblad master equations**: [Potts (2024)][potts2024]
+- **FCS, recursive scheme, vectorization, Drazin inverse**: [Landi et al. (2024)][landi2024]
+- **Detailed exposition of the recursive scheme**: [Flindt et al. (2010)][flindt2010]
+
+[landi2024]: arXiv:2303.04270v4 "Current fluctuations in open quantum systems: Bridging the gap between quantum continuous measurements and full counting statistics"
+[potts2024]: https://doi.org/10.48550/arXiv.2406.19206 "Quantum Thermodynamics"
+[flindt2010]: arXiv:1002.4506v2 "Counting statistics of transport through Coulomb blockade nanostructures: High-order cumulants and non-Markovian effects"
