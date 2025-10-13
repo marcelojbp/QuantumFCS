@@ -18,6 +18,6 @@
     vId = ComplexF64.(vec(Id))'
     IdL = Matrix{ComplexF64}(I, length(vρss), length(vρss))
 
-    LDtest = drazin(H, J, vρss, vId, IdL)
+    LDtest = QuantumFCS.drazin(H, J, vρss, vId, IdL)
     @test  isapprox(norm(LDtest - qubit_drazin(γm, γp)) , 0, atol = 1e-10) 
 end
