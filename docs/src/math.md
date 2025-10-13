@@ -64,10 +64,8 @@ and $\mathcal{L}^+$ being the Drazin inverse of $\mathcal{L}$.
 
 ## References
 
-- **FCS in Lindblad master equations**: [Potts (2024)][potts2024]
-- **FCS, recursive scheme, vectorization, Drazin inverse**: [Landi et al. (2024)][landi2024]
-- **Detailed exposition of the recursive scheme**: [Flindt et al. (2010)][flindt2010]
+- **FCS in Lindblad master equations**: Potts (2024). [arXiv:2406.19206](https://doi.org/10.48550/arXiv.2406.19206) "Quantum Thermodynamics"
 
-[landi2024]: arXiv:2303.04270v4 "Current fluctuations in open quantum systems: Bridging the gap between quantum continuous measurements and full counting statistics"
-[potts2024]: https://doi.org/10.48550/arXiv.2406.19206 "Quantum Thermodynamics"
-[flindt2010]: arXiv:1002.4506v2 "Counting statistics of transport through Coulomb blockade nanostructures: High-order cumulants and non-Markovian effects"
+- **FCS, recursive scheme, vectorization, Drazin inverse**: Landi et al. (2024). [arXiv:2303.04270v4](https://arxiv.org/abs/2303.04270) "Current fluctuations in open quantum systems: Bridging the gap between quantum continuous measurements and full counting statistics"
+
+- **Detailed exposition of the recursive scheme**: Flindt et al. (2010). [arXiv:1002.4506v2](https://arxiv.org/abs/1002.4506) "Counting statistics of transport through Coulomb blockade nanostructures: High-order cumulants and non-Markovian effects"
