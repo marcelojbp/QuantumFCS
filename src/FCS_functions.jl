@@ -1,5 +1,5 @@
 """
-    fcscumulants_recursive(L, mJ, nC; <keyword arguments>)
+    fcscumulants_recursive(L, mJ, nC)
 
 Calculate n-th zero-frequency cumulant of full counting statistics using a recursive scheme.
 
