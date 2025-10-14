@@ -1,5 +1,6 @@
 """
-    fcscumulants_recursive(L, mJ, nC)
+    fcscumulants_recursive(L, mJ, nC, rho_ss, nu)
+    fcscumulants_recursive(H, J, mJ, nC, rho_ss, nu)
 
 Calculate n-th zero-frequency cumulant of full counting statistics using a recursive scheme.
 
@@ -10,6 +11,7 @@ Alternatively, one can provide the Hamiltonian and jump operators instead of `L`
 * `J`: Vector of jump operators (sparse or dense, Operator from QuantumOptics.jl)
 * `mJ`: Vector containing the monitored jump matrices (sparse operators in vectorized representation).
 * `nC`: Number of cumulants to be calculated.
+* `rho_ss`: Steady-state density matrix (sparse or dense, ComplexF64)
 * `nu`: Vector of length `length(mJ)` with weights for each jump.
 """
 function fcscumulants_recursive(

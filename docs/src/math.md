@@ -5,11 +5,12 @@ As a general scenario, we consider a Lindblad master equation,
 ```math
 \mathcal{L}\rho = \frac{d \rho}{dt} = -i[H, \rho] + \sum_{k=1}^r L_k \, \rho \, L_k^\dagger - \frac{1}{2}\{L^\dagger_k L_k, \rho \}.
 ```
-We introduce $p \le r$ counting fields $N_k$ with weights $\nu_k$. This lets us define the total current,
+We introduce $p \le r$ integrated currents $N_k$ with weights $\nu_k$. This lets us define the total integrated current,
 
 ```math
-N(t) = \sum_k \nu_k \, N_k(t)~.
+N(t) = \sum_{k=1}^p \nu_k \, N_k(t)~.
 ```
+Above, $\nu_k$ can be simply integers, e.g. $\pm 1$ to count electrons/photons, or have units to count electric charges ($e$) and  stochastic heat/work (energy). 
 
 We further define the $n$-resolved density matrix $\rho_n(t)$ whose trace equals the probability to have accumulated $n$ jumps at time $t$, $P(n,t) = \operatorname{Tr}[\rho_n(t)]$. Summing over the set of allowed values $\mathcal{N}$ for the total charge $N$, we retrieve the standard density matrix,
 
@@ -23,7 +24,7 @@ We now consider the Fourier transform of the $n$-resolved density matrix,
 \rho_{\chi}(t) = \sum_{n \in \mathcal{N}} e^{i n \chi} \, \rho_n(t)~.
 ```
 
-$\chi$ is called the counting field and the time evolution of $\rho_{\chi}(t)$ is given by the generalized master equation (GME),
+where $\chi$ is called the counting field and the time evolution of $\rho_{\chi}(t)$ is given by the generalized master equation (GME),
 
 ```math
 \mathcal{L}_\chi \, \rho_\chi = \bigl(\mathcal{L} + \delta \mathcal{L}_\chi\bigr)\rho_\chi,
@@ -34,6 +35,7 @@ where
 ```math
 \delta \mathcal{L}_\chi = \sum_{k=1}^p\bigl(1-e^{i\nu_k \chi}\bigr) \, L_k \, (\cdot) \, L_k^\dagger~.
 ```
+
 
 **Computing cumulants using recursive methods**
 
@@ -60,3 +62,11 @@ with the constituents,
 ```
 
 and $\mathcal{L}^+$ being the Drazin inverse of $\mathcal{L}$.
+
+## References
+
+- **FCS in Lindblad master equations**: Potts (2024). "Quantum Thermodynamics" [arXiv](https://doi.org/10.48550/arXiv.2406.19206)
+
+- **FCS, recursive scheme, vectorization, Drazin inverse**: Landi et al. (2024). "Current fluctuations in open quantum systems: Bridging the gap between quantum continuous measurements and full counting statistics", PRX Quantum 5, 020201 (2024) [arXiv](https://arxiv.org/abs/2303.04270) 
+
+- **Detailed exposition of the recursive scheme**: Flindt et al. (2010). "Counting statistics of transport through Coulomb blockade nanostructures: High-order cumulants and non-Markovian effects" Phys. Rev. B 82, 155407 [arXiv](https://arxiv.org/abs/1002.4506)

@@ -21,5 +21,5 @@
         vId = vec(Matrix{ComplexF64}(I, size(rho_ss.data)))'
 
         # testing whether drazin_apply and drazin yield the same result
-        @test norm(QuantumFCS.drazin_apply(H, J, valpha, vrho_ss, vId)-drazin(H, J, vrho_ss, vId, IdL)*valpha) ≈ 0 atol=10^(-10)
+        @test norm(QuantumFCS.drazin_apply(H, J, valpha, vrho_ss, vId)-QuantumFCS.drazin(H, J, vrho_ss, vId, IdL)*valpha) ≈ 0 atol=10^(-10)
 end
