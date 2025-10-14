@@ -20,7 +20,6 @@ b = FockBasis(1)
 # Operators 
 d = destroy(b)
 d_dag = create(b)
-id = identityoperator(b)
 # Parameters
 ϵd = 1.0;                            # Energy level of the quantum dot
 κc = 0.1;                            # Coupling strength to cold reservoir
