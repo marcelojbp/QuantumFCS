@@ -8,13 +8,13 @@ To install the package, in the Julia REPL,
 ] add https://github.com/marcelojbp/QuantumFCS
 ```
 
-## Quickstart examples
+## Quickstart example
+
+We model a quantum dot heat engine as a single mode coupled to two reservoirs (hot and cold) in the large bias limit (nc = 0, nh = 1).
 
 ```julia
 using QuantumOptics 
 using QuantumFCS
-
-## We model a quantum dot heat engine as a single mode coupled to two reservoirs (hot and cold) in the large bias limit (nc = 0, nh = 1). 
 # Basis for the single quantum dot
 b = FockBasis(1)
 # Operators 
