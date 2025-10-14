@@ -10,7 +10,7 @@ To install the package, in the Julia REPL,
 
 ## Quickstart example
 
-We model a quantum dot heat engine as a single mode coupled to two reservoirs (hot and cold) in the large bias limit (nc = 0, nh = 1).
+We model a quantum dot heat engine as a single mode coupled to two reservoirs (hot and cold) in the large bias limit ($n_c = 0,~ n_h = 1$).
 
 ```julia
 using QuantumOptics 
